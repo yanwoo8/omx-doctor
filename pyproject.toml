@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omx-doctor"
+version = "0.1.0"
+description = "ROBOTIS OpenManipulator-X의 Dynamixel 모터 진단과 설정 CLI"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Yanwoo Kim" }, { name = "Yumin Kim" }]
+keywords = ["dynamixel", "open-manipulator-x", "lerobot", "robotics", "troubleshooting"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering",
+]
+dependencies = ["dynamixel-sdk>=3.7.31"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/yanwoo8/omx-doctor"
+Issues = "https://github.com/yanwoo8/omx-doctor/issues"
+
+[project.scripts]
+omx-doctor = "omx_doctor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
