@@ -28,6 +28,11 @@ except ImportError as exc:  # pragma: no cover - install hint
         "dynamixel-sdk is required. Run: pip install dynamixel-sdk"
     ) from exc
 
+# A motor with a latched hardware error sets this bit in the error field of
+# every status packet. It only says "check Hardware_Error_Status"; the data
+# in the packet is still valid, so it must not be treated as a failure.
+ERRBIT_ALERT = 0x80
+
 
 class BusError(Exception):
     """A motor cannot be reached."""
@@ -101,7 +106,7 @@ class Bus:
             4: self._ph.read4ByteTxRx,
         }[nbytes]
         value, result, error = reader(self._port, motor_id, addr)
-        if result != COMM_SUCCESS or error != 0:
+        if result != COMM_SUCCESS or error & ~ERRBIT_ALERT:
             return None
         return to_signed(value, nbytes) if signed else value
 
@@ -133,7 +138,10 @@ class Bus:
         """Reboot a motor to clear its latched error. This also resets RAM."""
         result, _ = self._ph.reboot(self._port, motor_id)
         if result != COMM_SUCCESS:
-            raise BusError("Cannot reboot id %d." % motor_id)
+            raise BusError(
+                "Cannot reboot id %d. Check the arm's power and the USB "
+                "connection (on WSL2, run `usbipd attach` again)." % motor_id
+            )
         time.sleep(settle)
 
     # Common combinations ---------------------------------------------
