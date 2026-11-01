@@ -13,20 +13,16 @@ properties of an individual arm. Measure yours.
 
 ## Install
 
+omx-doctor runs on Linux, including WSL2 on Windows. It looks for the arm at
+`/dev/ttyUSB*` and `/dev/ttyACM*`, so it does not work from native Windows or
+macOS.
+
 Activate your virtual environment first: the one you use for the
 OpenManipulator-X, LeRobot, or both.
 
 ```bash
 conda activate <your-env>        # conda
-source <your-env>/bin/activate   # venv, Linux/macOS
-<your-env>\Scripts\Activate.ps1  # venv, Windows PowerShell
-```
-
-On Windows PowerShell, if `Activate.ps1` is blocked by the execution policy,
-run this once:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+source <your-env>/bin/activate   # venv
 ```
 
 Then install:
@@ -48,6 +44,16 @@ yourself to the `dialout` group, then log out and back in:
 
 ```bash
 sudo usermod -aG dialout "$USER"
+```
+
+On WSL2, the USB adapter is not visible until you attach it from Windows with
+[usbipd-win](https://github.com/dorssel/usbipd-win). Run this in an
+administrator PowerShell, using the BUSID that `usbipd list` shows for the
+adapter:
+
+```powershell
+usbipd bind --busid <BUSID>            # once
+usbipd attach --wsl --busid <BUSID>    # after every replug or reboot
 ```
 
 ## Before you start
@@ -389,22 +395,28 @@ Each argument is `LEADER:FOLLOWER`. Use your own IDs; `status` lists them.
 ```
   PAIR               LEADER  FOLLOWER    OFFSET
   1:11                 2047      2051         4
-  6:16                 2048      2140        92
+  6:16                 2048      2280       232
 
 1:11  Offset 4. Within the normal range.
-6:16  Offset 92. The zero point has drifted. Measure the range and zero again in section 3.
+6:16  Offset 232. The zero point has drifted. Measure the range and zero again in section 3.
 ```
 
 ### 4.2 Read the offsets
 
 | Offset | What it is | What to do |
 | --- | --- | --- |
-| up to about 50 | normal play and sensor noise | nothing |
-| tens to a few hundred | the zero point has drifted | [3](#3-travel-range) |
-| several hundred or more | joint assembled at a different angle | [4.3](#43-reassemble-the-joint) |
+| up to about 150 | normal play and sensor noise | nothing |
+| about 150 to 400 | the zero point has drifted | [3](#3-travel-range) |
+| 400 or more | joint assembled at a different angle | [4.3](#43-reassemble-the-joint) |
 
 4096 counts is one revolution, so divide by about 11.4 for degrees. A small
 offset is not worth chasing: teleoperation absorbs it.
+
+`compare` also warns when either reading sits within about 200 of 0 or 4095,
+or past them. Such a joint can read 4090 one moment and -6 the next, and the
+motor treats that as a full turn, which trips `Overload` even when the two arms
+look aligned. Reassemble it so the rest pose reads near 2048
+([4.3](#43-reassemble-the-joint)).
 
 ### 4.3 Reassemble the joint
 
