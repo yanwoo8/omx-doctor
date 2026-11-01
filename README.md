@@ -13,12 +13,35 @@ properties of an individual arm. Measure yours.
 
 ## Install
 
+Activate your virtual environment first: the one you use for the
+OpenManipulator-X, LeRobot, or both.
+
+```bash
+conda activate <your-env>        # conda
+source <your-env>/bin/activate   # venv, Linux/macOS
+<your-env>\Scripts\Activate.ps1  # venv, Windows PowerShell
+```
+
+On Windows PowerShell, if `Activate.ps1` is blocked by the execution policy,
+run this once:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+Then install:
+
 ```bash
 git clone https://github.com/yanwoo8/omx-doctor.git
 cd omx-doctor
 pip install -e .
 omx-doctor status
 ```
+
+The `omx-doctor` command is available only while that environment is active.
+If you use LeRobot, install into the same environment as LeRobot so omx-doctor
+can make LeRobot keep your motor settings
+([2.5](#25-settings-do-not-survive-lerobot)).
 
 The only dependency is `dynamixel-sdk`. If `status` reports no serial port, add
 yourself to the `dialout` group, then log out and back in:
