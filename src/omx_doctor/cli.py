@@ -125,6 +125,7 @@ def main(argv=None):
     # Hardware modules are imported here so that --help works without
     # dynamixel-sdk installed.
     from . import commands
+    from .bus import BusError
     from .registers import SCAN_IDS
 
     if hasattr(args, "ids") and args.ids is None:
@@ -144,6 +145,9 @@ def main(argv=None):
     }
     try:
         return handlers[args.command](args)
+    except BusError as exc:
+        print("error: %s" % exc, file=sys.stderr)
+        return 1
     except KeyboardInterrupt:
         print()
         return 130
