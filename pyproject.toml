@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omx-doctor"
-version = "0.1.0"
+version = "0.1.1"
 description = "ROBOTIS OpenManipulator-X의 Dynamixel 모터 진단과 설정 CLI"
 readme = "README.md"
 requires-python = ">=3.9"
