@@ -12,10 +12,14 @@ import time
 from . import calib, patch, registers as reg
 from .bus import BusError, find_motor, open_all
 from .decode import (
+    DIFF_SMALL,
+    MIN_SPAN,
+    boundary_verdict,
     diff_verdict,
     format_error,
     format_mode,
     pwm_verdict,
+    range_usable,
     range_verdict,
     temperature_verdict,
     triage,
@@ -266,10 +270,10 @@ def current(args):
                 "  Goal_Current only caps force in current-based position "
                 "control (mode 5). In this mode it may do nothing."
             )
-        if limit is not None and args.value > limit:
+        if limit is not None and abs(args.value) > limit:
             return _fail(
-                "Goal_Current %d is above Current_Limit %d, so the motor will "
-                "silently ignore it." % (args.value, limit)
+                "Goal_Current %d is outside -%d to %d (Current_Limit), so the "
+                "motor will refuse it." % (args.value, limit, limit)
             )
         result = bus.write(args.id, reg.GOAL_CURRENT, args.value)
         print(result.line("Goal_Current"))
@@ -394,7 +398,7 @@ def measure(args):
         print()
         print()
         print(range_verdict(low, high))
-        if low is None:
+        if not range_usable(low, high):
             return 1
         print()
         print("To write this range to the motor:")
@@ -407,6 +411,18 @@ def measure(args):
 
 
 # 8. set-range -------------------------------------------------------
+
+
+def _range_problem(low, high):
+    """Return why a range given on the command line cannot be written, or None."""
+    if low >= high:
+        return "The minimum must be below the maximum."
+    if high - low < MIN_SPAN:
+        return (
+            "The range is only %d counts wide, which would lock the joint in "
+            "place. Measure it again with `measure`." % (high - low)
+        )
+    return None
 
 
 def _write_range(bus, motor_id, low, high, homing_offset):
@@ -428,8 +444,9 @@ def _write_range(bus, motor_id, low, high, homing_offset):
 
 def set_range(args):
     """Write a travel range to the motor's EEPROM."""
-    if args.min >= args.max:
-        return _fail("The minimum must be below the maximum.")
+    problem = _range_problem(args.min, args.max)
+    if problem:
+        return _fail(problem)
 
     try:
         bus = find_motor(args.id)
@@ -466,8 +483,9 @@ def sync_calib(args):
     EEPROM goes first, and the file is left alone if any write is
     refused, because the worst outcome is the two disagreeing.
     """
-    if args.min >= args.max:
-        return _fail("The minimum must be below the maximum.")
+    problem = _range_problem(args.min, args.max)
+    if problem:
+        return _fail(problem)
 
     try:
         path = calib.find_file(args.joint, args.id)
@@ -568,7 +586,10 @@ def compare(args):
             offset = None if leader is None or follower is None else follower - leader
             print("  %-16s %9s %9s %9s" % (label, leader, follower, offset))
             verdicts.append((label, diff_verdict(offset)))
-            if offset is None or abs(offset) > 50:
+            boundary = boundary_verdict(leader, follower)
+            if boundary:
+                verdicts.append((label, boundary))
+            if offset is None or abs(offset) > DIFF_SMALL or boundary:
                 problems += 1
     finally:
         for bus in buses:
