@@ -144,8 +144,13 @@ class TestDiffVerdict:
         assert "normal" in decode.diff_verdict(12)
         assert "normal" in decode.diff_verdict(-50)
 
+    def test_offsets_seen_on_a_working_arm_are_normal(self):
+        # 2:12 read 91 to 105 in every session and teleoperation still worked.
+        assert "normal" in decode.diff_verdict(99)
+        assert "normal" in decode.diff_verdict(-105)
+
     def test_medium_offset_is_the_zero_point(self):
-        text = decode.diff_verdict(92)
+        text = decode.diff_verdict(230)
         assert "zero point" in text
         assert "section 3" in text
 
@@ -176,3 +181,36 @@ class TestRangeVerdict:
 
     def test_no_measurement(self):
         assert "No measurement" in decode.range_verdict(None, 100)
+
+    def test_a_joint_that_did_not_move(self):
+        assert "did not move" in decode.range_verdict(2048, 2048)
+
+    def test_the_boundary_points_to_reassembly(self):
+        assert "4.3" in decode.range_verdict(-51, 4045)
+
+
+class TestRangeUsable:
+    def test_normal_range(self):
+        assert decode.range_usable(2123, 2873)
+
+    def test_noise_is_not_usable(self):
+        assert not decode.range_usable(2047, 2049)
+
+    def test_beyond_the_boundary_is_not_usable(self):
+        assert not decode.range_usable(-51, 4045)
+
+    def test_no_measurement_is_not_usable(self):
+        assert not decode.range_usable(None, 2048)
+
+
+class TestBoundary:
+    def test_middle_of_the_range(self):
+        assert not decode.near_boundary(2048)
+
+    def test_readings_from_the_session(self):
+        for position in (7, 0, -149, 3947, 4146):
+            assert decode.near_boundary(position)
+
+    def test_pair_verdict(self):
+        assert decode.boundary_verdict(2039, 1999) is None
+        assert "4.3" in decode.boundary_verdict(3947, 7)
