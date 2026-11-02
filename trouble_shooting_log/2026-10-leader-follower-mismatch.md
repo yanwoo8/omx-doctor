@@ -26,10 +26,15 @@ It was left uncorrected. Teleoperation absorbed it without visible trouble, and
 whose sign convention had not been verified on this hardware.
 
 Recorded because the decision matters for reading the rest of this log: no
-`Homing_Offset` was ever computed to cancel an offset here. The threshold in
-`decode.py` that calls a few hundred counts an assembly problem and tens of
-counts a drifted zero comes from this one comparison, and it is a judgement
-about wording, not a measurement.
+`Homing_Offset` was ever computed to cancel an offset here. The thresholds in
+`decode.py` first came from this one comparison, as a judgement about wording
+rather than a measurement.
+
+Update for 0.1.1: later sessions showed that offsets of 40 to
+105 counts teleoperate fine, so the normal band was raised from 50 to 150
+counts. The residual 92 counts above now reads as normal, which matches what
+was observed. `compare` also warns when a reading sits near 0 or 4095, after a
+pair at 3947 and 7 tripped `Overload` while looking aligned.
 
 ## The follower gripper would not open all the way
 
