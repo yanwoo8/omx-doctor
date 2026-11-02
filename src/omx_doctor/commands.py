@@ -58,7 +58,7 @@ def status(args):
                 continue
             print("%s" % bus.device)
             print(
-                "  %-4s %-7s %-30s %9s %9s %7s %6s  %s"
+                "  %-4s %-7s %-34s %9s %9s %7s %6s  %s"
                 % (
                     "ID",
                     "MODEL",
@@ -74,7 +74,7 @@ def status(args):
                 total += 1
                 error = bus.read(motor_id, reg.HARDWARE_ERROR)
                 print(
-                    "  %-4d %-7s %-30s %9s %9s %7s %6s  %s"
+                    "  %-4d %-7s %-34s %9s %9s %7s %6s  %s"
                     % (
                         motor_id,
                         model,
