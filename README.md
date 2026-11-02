@@ -1,10 +1,12 @@
 # omx-doctor
 
-> **Contributions welcome.** This tool grew out of one arm, so it has surely
-> missed cases that come up on yours. [Issues](https://github.com/yanwoo8/omx-doctor/issues),
-> pull requests and suggestions of any size are welcome, and so is anyone who
-> wants to help develop it further. See [Development](#development) to get
-> started.
+> 🤝 **Contributions are warmly welcome!** This tool grew out of a single arm,
+> so your OMX has probably seen things ours never did, and we would love to hear
+> about them. Found a bug, a confusing message, or a verdict that reads your
+> hardware wrong? Open an [issue](https://github.com/yanwoo8/omx-doctor/issues)
+> or send a pull request. No contribution is too small, and if you would like to
+> help build this tool with us, you are more than welcome. 🙌 See
+> [Development](#development) to get started.
 
 A command-line tool for the problems that stop a
 [ROBOTIS OMX](https://docs.robotis.com/docs/systems/omx/introduction/) (the
