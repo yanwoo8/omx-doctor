@@ -18,7 +18,7 @@ def build_parser():
     parser = argparse.ArgumentParser(
         prog="omx-doctor",
         description="Diagnose and configure the Dynamixel motors in a "
-        "ROBOTIS OpenManipulator-X.",
+        "ROBOTIS OMX.",
         epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

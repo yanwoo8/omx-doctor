@@ -1,8 +1,8 @@
 # Troubleshooting log
 
-Session notes from the run this tool came out of: one OpenManipulator-X driven
-by LeRobot during a Physical AI course, used for teleoperated pick-and-place
-recording.
+Session notes from the run this tool came out of: one ROBOTIS OMX (OMX-F
+follower and OMX-L leader) driven by LeRobot during a Physical AI course, used
+for teleoperated pick-and-place recording.
 
 These are records, not guidance. They say what was observed on one particular
 arm, which attempts failed, and what the final values were. The arm has since

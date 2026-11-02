@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "omx-doctor"
 version = "0.1.1"
-description = "Diagnose and configure the Dynamixel motors in a ROBOTIS OpenManipulator-X, with LeRobot support."
+description = "Diagnose and configure the Dynamixel motors in a ROBOTIS OMX, with LeRobot support."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Yanwoo Kim" }, { name = "Yumin Kim" }]
-keywords = ["dynamixel", "open-manipulator-x", "lerobot", "robotics", "troubleshooting"]
+keywords = ["dynamixel", "robotis", "omx", "lerobot", "robotics", "troubleshooting"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Environment :: Console",

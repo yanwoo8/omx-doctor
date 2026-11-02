@@ -1,12 +1,23 @@
 # omx-doctor
 
-A command-line tool for the problems that stop a ROBOTIS OpenManipulator-X from
-working: a gripper that keeps latching `Overload`, a travel range that resets
-itself, a follower arm that will not match the leader.
+> **Contributions welcome.** This tool grew out of one arm, so it has surely
+> missed cases that come up on yours. [Issues](https://github.com/yanwoo8/omx-doctor/issues),
+> pull requests and suggestions of any size are welcome, and so is anyone who
+> wants to help develop it further. See [Development](#development) to get
+> started.
+
+A command-line tool for the problems that stop a
+[ROBOTIS OMX](https://docs.robotis.com/docs/systems/omx/introduction/) (the
+OMX-F follower arm and OMX-L leader) from working: a gripper that keeps latching
+`Overload`, a travel range that resets itself, a follower arm that will not
+match the leader.
+
+OMX is not the same product as the older OpenMANIPULATOR-X. This tool is
+written and tested against OMX.
 
 Install it, find your symptom in the table, follow that section from the top.
-Sections 1 to 3 work on any Dynamixel Protocol 2.0 arm over USB; sections 4 and
-5 assume [LeRobot](https://github.com/huggingface/lerobot).
+Everything works on any Dynamixel Protocol 2.0 arm over USB except the sections
+marked (LeRobot), which assume [LeRobot](https://github.com/huggingface/lerobot).
 
 **Every number here is a placeholder.** Ranges, gains and current limits are
 properties of an individual arm. Measure yours.
@@ -17,8 +28,8 @@ omx-doctor runs on Linux, including WSL2 on Windows. It looks for the arm at
 `/dev/ttyUSB*` and `/dev/ttyACM*`, so it does not work from native Windows or
 macOS.
 
-Activate your virtual environment first: the one you use for the
-OpenManipulator-X, LeRobot, or both.
+Activate your virtual environment first: the one you use for OMX, LeRobot, or
+both.
 
 ```bash
 conda activate <your-env>        # conda
@@ -98,10 +109,10 @@ omx-doctor status
 ```
 
 ```
-/dev/ttyUSB0
-  ID   MODEL   MODE                           POSITION   CURRENT     PWM   TEMP  ERROR
-  11   1060    current-based position control     2047         3       6     31  clear
-  16   1200    current-based position control     2338      -162    -885     38  32 (Overload)
+/dev/ttyACM0
+  ID   MODEL   MODE                                POSITION   CURRENT     PWM   TEMP  ERROR
+  11   1060    4 (extended position control)           2047         3       6     31  clear
+  16   1200    5 (current-based position control)      2338      -162    -885     38  32 (Overload)
 
 Found 2 motor(s).
 
@@ -216,8 +227,9 @@ Two constraints the command checks for you:
 
 - `Goal_Current` only limits force in current-based position control
   (`Operating_Mode` 5). `status` shows the mode.
-- A value above `Current_Limit` is silently ignored, so it is refused rather
-  than left looking successful.
+- `Goal_Current` must sit between `-Current_Limit` and `Current_Limit`. A value
+  outside that is refused before it is written rather than left looking
+  successful.
 
 ### 2.4 When it only stalls in one spot
 
@@ -299,7 +311,7 @@ Torque is released first. Move the joint slowly to each mechanical stop (not to
 where it feels like enough) while it records. `Ctrl-C` finishes early.
 
 ```
-id 16 on /dev/ttyUSB0. Torque is off.
+id 16 on /dev/ttyACM0. Torque is off.
   position   2873   min   2123   max   2873
 
 Range 2123 to 2873 (span 750, about 66 degrees).
@@ -307,6 +319,12 @@ Range 2123 to 2873 (span 750, about 66 degrees).
 To write this range to the motor:
   omx-doctor set-range 16 2123 2873
 ```
+
+The command is offered only for a range worth writing. If the joint barely
+moved (a span under 50 counts, which is sensor noise), `measure` says so and
+exits 1. If a reading went past 0 or 4095, the joint's zero sits on the encoder
+boundary, and measuring again will not fix that: go to
+[4.3](#43-reassemble-the-joint).
 
 ### 3.2 Write it to the motor
 
@@ -324,7 +342,8 @@ Stored in EEPROM. It survives a power cycle.
 ```
 
 `REFUSED` means the motor kept its old value, usually an out-of-range number or
-torque still on. Fix and run again.
+torque still on. Fix and run again. A range under 50 counts wide is refused
+before anything is written, because it would lock the joint in place.
 
 `--homing-offset` is available here, but it shifts the frame the limits are
 expressed in, which invalidates the range you just measured. Leave it alone
@@ -345,10 +364,10 @@ The file is located by matching both the joint name and the motor ID, so leader
 and follower profiles that share joint names are not confused.
 
 ```
-Calibration file: ~/.cache/huggingface/lerobot/calibration/robots/my_omx/my_omx_arm.json
+Calibration file: ~/.cache/huggingface/lerobot/calibration/robots/omx_follower/omx_follower_arm.json
   now:  id 16, homing_offset 0, range 0 to 4095
 
-id 16 on /dev/ttyUSB0
+id 16 on /dev/ttyACM0
   Min_Position_Limit      (52)  ->  2123     ok
   Max_Position_Limit      (48)  ->  2873     ok
 
@@ -429,6 +448,10 @@ The horn mounts at discrete positions, so get within one step rather than
 exactly on zero. Then re-measure the range (section 3), because the mechanical
 stops moved.
 
+When both arms are off, matching them to each other is not enough. Aim for the
+rest pose to read near 2048 on both, well away from 0 and 4095, so the joint
+never crosses the encoder boundary (4.2).
+
 ### 4.4 The gripper will not open far enough
 
 Two causes, in this order.
@@ -454,7 +477,7 @@ lerobot-record       ... --teleop.gripper_open_pos=95
 shell corrupts traffic for all of them, and it looks like random communication
 failures. Stop everything else first.
 
-**Device names move.** `/dev/ttyUSB0` and `ttyUSB1` swap with plug order, so a
+**Device names move.** `/dev/ttyACM0` and `ttyACM1` swap with plug order, so a
 port written into a script eventually points at the wrong arm. Every command
 here finds motors by ID across all ports instead.
 
@@ -518,14 +541,20 @@ assert readback == value
 Clear the error and release torque before any EEPROM write, or it is refused:
 
 ```python
+import time
+
 if ph.read1ByteTxRx(port, MOTOR_ID, 70)[0]:   # Hardware_Error_Status
     ph.reboot(port, MOTOR_ID)
     time.sleep(1.5)
 ph.write1ByteTxRx(port, MOTOR_ID, 64, 0)      # Torque_Enable = 0
 ```
 
-Addresses are in `src/omx_doctor/registers.py`; the control table is in the
-[Dynamixel e-Manual](https://emanual.robotis.com/docs/en/dxl/x/xm430-w350/).
+While an error is latched, every reply carries 0x80 in its error field (the
+SDK prints "Hardware error occurred"). The value in that reply is still valid,
+so do not discard reads because of that bit alone.
+
+Addresses are in `src/omx_doctor/registers.py`; the control table for each
+model is in the [DYNAMIXEL X-series model reference](https://docs.robotis.com/docs/dxl/model_reference/x_series/).
 
 ## Development
 
@@ -543,12 +572,25 @@ src/omx_doctor/
   bus.py         port discovery, verified reads and writes (hardware I/O)
   commands.py    the subcommands
   cli.py         argument parsing
+tests/
+  conftest.py    a simulated Dynamixel bus that stands in for dynamixel_sdk
+  test_*.py      unit tests, and every subcommand run against the simulated bus
 ```
 
-Hardware I/O is confined to `bus.py` and everything else is pure, so the test
-suite covers it without a robot attached. That split is not a style choice: this
-tool is published for arms we cannot test against, so the parts that can be
-verified in isolation are kept verifiable.
+Hardware I/O is confined to `bus.py`, so the test suite runs without a robot
+attached. `decode.py`, `patch.py` and `calib.py` are tested directly. The
+subcommands run against the simulated bus in `tests/conftest.py`, whose motors
+follow the Protocol 2.0 rules this tool depends on: the 0x80 Alert bit while an
+error is latched, EEPROM refused while torque is on, out-of-range values
+refused, and RAM reset on reboot. Many cases use readings recorded on a real
+arm. That split is not a style choice: this tool is published for arms we
+cannot test against, so the parts that can be verified in isolation are kept
+verifiable.
+
+If you change how a command talks to a motor, add a case to
+`tests/test_commands.py`. If real hardware behaves differently from the
+simulated bus, fix `conftest.py` too, and say what you observed in the pull
+request.
 
 Reports from other arms are welcome, especially where a verdict threshold in
 `decode.py` reads your hardware wrong.
@@ -559,8 +601,8 @@ arm, not guidance, and nothing in it should be copied as a setting.
 
 ## Credits
 
-The methods in this tool were worked out jointly on one OpenManipulator-X
-during a Physical AI course.
+The methods in this tool were worked out jointly on one ROBOTIS OMX during a
+Physical AI course.
 
 - [Yanwoo Kim](https://github.com/yanwoo8)
 - [Yumin Kim](https://github.com/Yu-billie)
