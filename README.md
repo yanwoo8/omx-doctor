@@ -603,11 +603,14 @@ arm, not guidance, and nothing in it should be copied as a setting.
 
 ## Credits
 
-The methods in this tool were worked out jointly on one ROBOTIS OMX during a
-Physical AI course.
+The methods in this tool were worked out jointly on one ROBOTIS OMX during the
+Physical AI Robot Action Modeling course.
 
 - [Yanwoo Kim](https://github.com/yanwoo8)
 - [Yumin Kim](https://github.com/Yu-billie)
+
+Reviewed by Dr. Yu Shin (ys9072@paran.com), instructor of the Physical AI Robot
+Action Modeling course.
 
 ## License
 
