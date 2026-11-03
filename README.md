@@ -4,7 +4,7 @@
 ### Diagnose and fix the DYNAMIXEL motors in a ROBOTIS OMX
 
 **Yanwoo Kim · Yumin Kim**  
-Reviewed by Dr. Yu Shin
+Reviewed by Dr. Shin Yu
 
 [![ROBOTIS OMX docs](https://img.shields.io/badge/ROBOTIS-OMX%20docs-0067B1)](https://docs.robotis.com/docs/systems/omx/introduction/)
 [![LeRobot](https://img.shields.io/badge/LeRobot-GitHub-FFD21E?logo=huggingface&logoColor=black)](https://github.com/huggingface/lerobot)
@@ -645,7 +645,7 @@ Physical AI Robot Action Modeling course.
 - [Yanwoo Kim](https://github.com/yanwoo8)
 - [Yumin Kim](https://github.com/Yu-billie)
 
-Reviewed by Dr. Yu Shin (ys9072@paran.com), instructor of the Physical AI Robot
+Reviewed by Dr. Shin Yu (ys9072@paran.com), instructor of the Physical AI Robot
 Action Modeling course.
 
 ## License
