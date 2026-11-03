@@ -1,4 +1,23 @@
+<div align="center">
+
 # omx-doctor
+### Diagnose and fix the DYNAMIXEL motors in a ROBOTIS OMX
+
+**Yanwoo Kim · Yumin Kim**  
+Reviewed by Dr. Yu Shin
+
+[![ROBOTIS OMX docs](https://img.shields.io/badge/ROBOTIS-OMX%20docs-0067B1)](https://docs.robotis.com/docs/systems/omx/introduction/)
+[![LeRobot](https://img.shields.io/badge/LeRobot-GitHub-FFD21E?logo=huggingface&logoColor=black)](https://github.com/huggingface/lerobot)
+[![Hugging Face org](https://img.shields.io/badge/Hugging%20Face-lerobot--omx-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/lerobot-omx)  
+[![ACT models](https://img.shields.io/badge/ACT%20models-rollouts-FF9D00?logo=huggingface&logoColor=white)](https://huggingface.co/lerobot-omx/omx-act-models)
+[![omx-setup](https://img.shields.io/badge/omx--setup-troubleshooting%20notes-FF9D00?logo=huggingface&logoColor=white)](https://huggingface.co/lerobot-omx/omx-setup)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+
+<img src="./omx.png" width="560" alt="ROBOTIS OMX follower and leader">
+
+<sub>The OMX-F follower (left) and the OMX-L leader (right). Image: ROBOTIS.</sub>
+
+</div>
 
 > 🤝 **Contributions are warmly welcome!** This tool grew out of a single arm,
 > so your OMX has probably seen things ours never did, and we would love to hear
@@ -16,6 +35,23 @@ match the leader.
 
 OMX is not the same product as the older OpenMANIPULATOR-X. This tool is
 written and tested against OMX.
+
+### Where this came from
+
+omx-doctor came out of our imitation learning work in
+[**lerobot-omx**](https://huggingface.co/lerobot-omx), a Hugging Face
+organization where we record teleoperated demonstrations on OMX, train
+policies, and roll them out on the real arm.
+
+- [**omx-act-models**](https://huggingface.co/lerobot-omx/omx-act-models): the
+  ACT policies we trained, with rollout results for each model.
+- [**omx-setup**](https://huggingface.co/lerobot-omx/omx-setup): the
+  troubleshooting notes from those sessions. Every check in this tool started
+  as a step in these notes.
+
+Thanks to [ROBOTIS](https://www.robotis.com/) for the OMX hardware and its
+documentation, and to the [LeRobot](https://github.com/huggingface/lerobot) team
+at Hugging Face for the framework this all runs on.
 
 Install it, find your symptom in the table, follow that section from the top.
 Everything works on any Dynamixel Protocol 2.0 arm over USB except the sections
