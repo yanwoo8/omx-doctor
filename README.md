@@ -3,6 +3,8 @@
 # omx-doctor
 ### Diagnose and fix the DYNAMIXEL motors in a ROBOTIS OMX
 
+**English** · [한국어](README-kor.md)
+
 **Yanwoo Kim · Yumin Kim**  
 Reviewed by Dr. Shin Yu
 
